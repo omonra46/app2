@@ -1,0 +1,287 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Даём браузеру понять тему: тёмные скроллбары, поля ввода, автоформы */
+    color-scheme: light;
+    --paper: #f5f4f1;
+    --paper-2: #ecebe6;
+    --court: #e2711d;
+    --court-soft: #f6e3d3;
+    --ink: #14161c;
+    /* #565960 — контраст к #f5f4f1 ≈ 7.4:1 (было 5.2 у #6a6c74) */
+    --ink-soft: #565960;
+    --line: rgba(20, 22, 28, 0.13);
+    --radius: 0.75rem;
+
+    /* Токены интерфейсных компонентов */
+    --background: 40 17% 95%;
+    --foreground: 222 18% 9%;
+    --card: 40 17% 97%;
+    --card-foreground: 222 18% 9%;
+    --popover: 40 17% 97%;
+    --popover-foreground: 222 18% 9%;
+    --primary: 24 79% 50%;
+    --primary-foreground: 40 17% 98%;
+    --secondary: 40 10% 90%;
+    --secondary-foreground: 222 18% 9%;
+    --muted: 40 10% 90%;
+    --muted-foreground: 222 8% 44%;
+    --accent: 24 79% 50%;
+    --accent-foreground: 222 18% 9%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 40 17% 98%;
+    --border: 40 10% 84%;
+    --input: 40 10% 84%;
+    --ring: 24 79% 50%;
+
+    --court-foreground: 40 17% 98%;
+    --win: 146 55% 38%;
+    --loss: 0 62% 47%;
+  }
+
+  .dark {
+    /* Тёмная тема: нативные контролы и скроллбары тоже становятся тёмными */
+    color-scheme: dark;
+    --paper: #12141a;
+    --paper-2: #1a1d24;
+    --court: #f08238;
+    --court-soft: #2a2118;
+    --ink: #eceef2;
+    /* #94969e — контраст к #12141a ≈ 7.0:1 (было 5.9 у #9a9ca4) */
+    --ink-soft: #94969e;
+    --line: rgba(236, 238, 242, 0.15);
+
+    --background: 222 18% 9%;
+    --foreground: 220 16% 93%;
+    --card: 222 16% 12%;
+    --card-foreground: 220 16% 93%;
+    --popover: 222 16% 12%;
+    --popover-foreground: 220 16% 93%;
+    --primary: 24 84% 58%;
+    --primary-foreground: 222 18% 9%;
+    --secondary: 222 14% 18%;
+    --secondary-foreground: 220 16% 93%;
+    --muted: 222 14% 18%;
+    --muted-foreground: 220 8% 66%;
+    --accent: 24 84% 58%;
+    --accent-foreground: 222 18% 9%;
+    --destructive: 0 55% 55%;
+    --destructive-foreground: 222 18% 9%;
+    --border: 222 12% 22%;
+    --input: 222 12% 24%;
+    --ring: 24 84% 58%;
+
+    --court-foreground: 222 18% 9%;
+    --win: 146 45% 48%;
+    --loss: 0 60% 58%;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Фиксированная шапка: якорные переходы не прячут заголовок секции */
+  scroll-padding-top: calc(4.5rem + env(safe-area-inset-top));
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  /* Смена темы не должна мигать: цвет подложки перетекает за токенами.
+     Свойства перечислены явно — transition на * тормозит прокрутку сцены */
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+  font-family: 'Manrope', -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* clip гасит горизонтальный выход за экран и, в отличие от hidden,
+     не превращает body в контейнер прокрутки — position: sticky работает */
+  overflow-x: clip;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Запасной вариант для браузеров без поддержки clip */
+@supports not (overflow: clip) {
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Без анимации тема переключается мгновенно */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
+
+/* Текстовые поля не должны вызывать автозум на iOS */
+input,
+select,
+textarea {
+  font-size: 1rem;
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: calc(5.5rem + env(safe-area-inset-top));
+  }
+}
+
+::selection {
+  background: var(--court);
+  color: var(--court-foreground);
+}
+
+.font-display {
+  font-family: 'Oswald', 'Manrope', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* Заголовки секций — одинаковый ритм капслоком */
+.eyebrow {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--court);
+  font-weight: 600;
+}
+
+/* Цифры в таблицах и счёте не «прыгают» */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ------------------------------------------------------------------ *
+ * Утилиты адаптива и доступности
+ * ------------------------------------------------------------------ */
+
+/* Отступы от вырезов экрана на iPhone: контент не заезжает под «челку»
+   и системные жесты. Используется шапкой и подвалом. */
+.site-safe-pad {
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+}
+
+/* Табличная подпись для скринридеров — видима только ассистивным техникам */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Ховер-состояния только для устройств с реальным курсором:
+   тач-экраны не получают «залипший» hover при тапе */
+@media (hover: none) {
+  .hover-only-hover {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Микродетали интерфейса
+ * ------------------------------------------------------------------ */
+
+/* Подъём карточек при наведении — только на устройствах с курсором,
+   чтобы тач-экраны не ловили «залипший» hover */
+@media (hover: hover) {
+  .lift {
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.3s ease;
+  }
+
+  .lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px -24px rgb(20 22 28 / 0.45);
+    border-color: rgb(226 113 29 / 0.45);
+  }
+
+  .dark .lift:hover {
+    box-shadow: 0 16px 40px -20px rgb(0 0 0 / 0.75);
+  }
+}
+
+/* Пункт навигации: черта вырастает от левого края при hover
+   и остаётся на активном разделе (scroll-spy ставит aria-current) */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.5rem;
+  height: 2px;
+  background: var(--court);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-link:hover::after,
+.nav-link[aria-current='true']::after {
+  transform: scaleX(1);
+}
+
+/* Без анимации черта появляется мгновенно */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::after {
+    transition: none;
+  }
+
+  .lift,
+  .lift:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Скроллбар в тон теме */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-soft);
+}

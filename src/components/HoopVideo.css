@@ -1,0 +1,120 @@
+/**
+ * Видеосцена «кольцо и мяч».
+ *
+ * Сценарий описан CSS-переменными, которые пишет useScrollProgress:
+ * скролл меняет только transform и opacity, поэтому кадр рисует
+ * композитор и прокрутка не тормозит. Обратный скролл проигрывает
+ * сценарий назад, так как все значения выведены из одного прогресса.
+ */
+
+.hoop-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  /* Вход: видео проявляется из темноты вместе с разгоранием свечения */
+  opacity: var(--video-in, 0);
+  /* Выход: сцена уступает место галерее моментов */
+  --v-out: var(--veil-out, 1);
+  transform: scale(calc(1 + (1 - var(--v-out, 1)) * 0.04));
+  /* Края видео растворяются в градиент вуали:
+     центр остаётся резким, периферия мягко уходит в фон сцены */
+  -webkit-mask-image: radial-gradient(
+    ellipse 62% 56% at 50% 46%,
+    black 0%,
+    black 52%,
+    rgb(0 0 0 / 0.6) 74%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 62% 56% at 50% 46%,
+    black 0%,
+    black 52%,
+    rgb(0 0 0 / 0.6) 74%,
+    transparent 100%
+  );
+}
+
+/**
+ * Вуаль фона сцены: постоянный градиент, на котором стоит кольцо из видео,
+ * с мягким затуханием краёв к соседним секциям. Тёплое свечение за кольцом
+ * разгорается по ходу сцены (--veil).
+ *
+ * Вуаль тематическая: в светлой — тёплый бумажный градиент от токенов,
+ * в тёмной — прежние почти чёрные значения (переопределены в .dark ниже).
+ */
+
+.hoop-veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* Светлая тема: тёплая середина над кольцом, спокойные бумажные края.
+     Значения — токены, поэтому следуют за темой из index.css */
+  --hoop-a: #f8efe4;
+  --hoop-b: var(--paper);
+  --hoop-c: var(--paper-2);
+  --hoop-d: var(--paper);
+  background: radial-gradient(
+    ellipse 90% 70% at 50% 34%,
+    var(--hoop-a) 0%,
+    var(--hoop-b) 42%,
+    var(--hoop-c) 78%,
+    var(--hoop-d) 100%
+  );
+  /* Вуаль уходит вместе со сценой (фаза exit), открывая страницу под галереей */
+  opacity: var(--veil-out, 1);
+  /* Мягкое затухание краёв, чтобы стык с соседними секциями не был виден */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 14%,
+    black 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 14%,
+    black 86%,
+    transparent 100%
+  );
+}
+
+/* Тёмная тема: прежний почти чёрный градиент сцены */
+.dark .hoop-veil {
+  --hoop-a: #1c1d24;
+  --hoop-b: #101218;
+  --hoop-c: #07080c;
+  --hoop-d: #040508;
+}
+
+/* Тёплое свечение за кольцом: разгорается по мере сцены
+   (управляется переменной --veil из useScrollProgress) и гаснет,
+   когда сцена уступает место галерее моментов.
+   В светлой теме свечение мягче, чтобы не «жечь» бумажный фон */
+.hoop-veil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  --hoop-glow: rgb(226 113 29 / 0.14);
+  background: radial-gradient(
+    ellipse 46% 34% at 50% 40%,
+    var(--hoop-glow) 0%,
+    rgb(226 113 29 / 0.06) 45%,
+    rgb(226 113 29 / 0) 72%
+  );
+  opacity: var(--veil, 0);
+}
+
+.dark .hoop-veil::after {
+  --hoop-glow: rgb(226 113 29 / 0.24);
+}
+
+/* Уменьшение движения: вуаль и видео не нужны, галерея без анимации */
+.hoop-sequence.is-static .hoop-veil,
+.hoop-sequence.is-static .hoop-video {
+  display: none;
+}

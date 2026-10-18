@@ -1,0 +1,93 @@
+/**
+ * Сцена «кольцо и мяч».
+ *
+ * Сценарий целиком описан CSS-переменными, которые пишет useScrollProgress:
+ * скролл меняет только transform и opacity, поэтому кадр рисует композитор
+ * и прокрутка не тормозит. Обратный скролл проигрывает сценарий назад,
+ * так как все значения выведены из одного прогресса.
+ */
+
+.hoop-sequence {
+  position: relative;
+  height: 100vh;
+  /* Длина пути прокрутки: больше значение — медленнее сценарий */
+  height: 320svh;
+  /* Сцена выходит за колонку контейнера: мяч летит из-за края экрана */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+}
+
+/* Уменьшение движения: статичная галерея без длинной прокрутки */
+.hoop-sequence.is-static {
+  height: auto;
+  /* Галерея видна сразу, без привязки к прогрессу прокрутки */
+  --photo: 1;
+}
+
+/* Без анимации кадры не нужно удерживать в одном экране */
+.hoop-sequence.is-static .hoop-stage {
+  position: static;
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+.hoop-sequence.is-static .moments {
+  margin: 0 auto;
+}
+
+.hoop-sequence.is-static .moment,
+.hoop-sequence.is-static .moments-title {
+  opacity: 1;
+  transform: none;
+}
+
+.hoop-stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+  place-items: center;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* Кольцо и галерея занимают одну ячейку сетки — кадры сменяют друг друга */
+.hoop-stage > * {
+  grid-area: 1 / 1;
+}
+
+/* ---- Галерея моментов ---- */
+
+.moments {
+  width: 100%;
+  max-width: 72rem;
+  justify-self: center;
+  align-self: center;
+  padding: 1.25rem;
+}
+
+.moments-title {
+  opacity: clamp(0, var(--photo, 0) * 4, 1);
+  transform: translate3d(0, calc((1 - clamp(0, var(--photo, 0) * 4, 1)) * 1.5rem), 0);
+}
+
+/* Каждый кадр появляется со своим порогом: --t задаётся из разметки */
+.moment {
+  --card: clamp(0, (var(--photo, 0) - var(--t, 0)) * 3.2, 1);
+  opacity: var(--card);
+  transform: translate3d(0, calc((1 - var(--card)) * 1.75rem), 0)
+    scale(calc(0.95 + var(--card) * 0.05));
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moment,
+  .moments-title {
+    transition: none;
+  }
+}

@@ -1,0 +1,28 @@
+<!--
+  SPA-fallback для GitHub Pages: сервер отдаёт этот файл на любой
+  несуществующий путь (например /app2/players) с кодом 404.
+  Скрипт восстанавливает исходный путь и подменяет его на /app2/,
+  чтобы BrowserRouter увидел настоящий URL после загрузки index.html.
+  Работает только на github.io (сайт в подпапке репозитория).
+-->
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Перенаправление…</title>
+    <script>
+      (function () {
+        // Путь до корня сайта внутри GitHub Pages (папка репозитория).
+        // Пример: при URL https://user.github.io/app2/team
+        // repoSegment = "/app2/", остальное — путь SPA-роутера.
+        var segments = location.pathname.split('/').filter(Boolean);
+        var repoSegment = segments.length ? '/' + segments[0] + '/' : '/';
+        sessionStorage.redirect = location.pathname + location.search;
+        location.replace(repoSegment);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Загрузка… Если ничего не произошло, откройте корень сайта.</p>
+  </body>
+</html>
