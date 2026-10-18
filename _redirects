@@ -1,0 +1,3 @@
+# SPA-fallback: BrowserRouter обслуживает все пути из index.html.
+# Cloudflare Pages сначала отдаёт реальный файл, срабатывает только для отсутствующих.
+/* /index.html 200

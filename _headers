@@ -1,0 +1,18 @@
+# https://developers.cloudflare.com/pages/configuration/serving-pages/
+
+# Хэшированные ассеты сборки Vite: имя файла меняется при изменении содержимого,
+# поэтому кэш можно держать бесконечно.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Шрифты и фото из public/ не хэшируются, но меняются редко — кэш на неделю.
+/fonts/*
+  Cache-Control: public, max-age=604800
+/photos/*
+  Cache-Control: public, max-age=604800
+
+# HTML не кэшируется: при новой сборке деплой должен увидеть сразу.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
